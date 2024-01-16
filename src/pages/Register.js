@@ -3,7 +3,8 @@ import { Logo, FormRow } from '../components';
 import Wrapper from '../assets/wrappers/RegisterPage';
 import { toast } from 'react-toastify';
 import { useSelector, useDispatch } from 'react-redux';
-import { loginUser, registerUser } from '../features/user/userSlice';
+import { useNavigate } from 'react-router-dom';
+import { loginUser, registerUser } from '../features/user/userThunk';
 
 const initialState = {
   name: '',
@@ -16,6 +17,15 @@ function Register() {
   const [values, setValues] = useState(initialState);
   const dispatch = useDispatch();
   const { isLoading, user } = useSelector((store) => store.user);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      setTimeout(() => {
+        navigate('/');
+      }, 1000);
+    }
+  }, [user, navigate]);
 
   const handleChange = (e) => {
     const name = e.target.name;
