@@ -3,7 +3,7 @@ import Wrapper from '../../assets/wrappers/DashboardFormPage';
 import { useSelector, useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 import { handleChange, clearValues } from '../../features/job/jobSlice';
-import { createJob } from '../../features/job/jobThunk';
+import { createJob, editJob } from '../../features/job/jobThunk';
 import { useEffect } from 'react';
 
 const AddJob = () => {
@@ -35,6 +35,21 @@ const AddJob = () => {
 
     if (!position || !company || !jobLocation) {
       toast.error('Please Fill Out All Fields');
+      return;
+    }
+    if (isEditing) {
+      dispatch(
+        editJob({
+          jobId: editJobId,
+          job: {
+            position,
+            company,
+            jobLocation,
+            jobType,
+            status,
+          },
+        })
+      );
       return;
     }
     dispatch(createJob({ position, company, jobLocation, jobType, status }));
