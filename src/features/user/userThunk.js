@@ -1,6 +1,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { logoutUser } from './userSlice';
-import customFetch from '../../utils/axios';
+import customFetch, { checkForUnauthorizedResponse } from '../../utils/axios';
+import { clearAllJobsState } from '../allJobs/allJobsSlice';
+import { clearValues } from '../job/jobSlice';
 
 export const registerUser = createAsyncThunk(
   'user/registerUser',
@@ -9,7 +11,7 @@ export const registerUser = createAsyncThunk(
       const resp = await customFetch.post('/auth/register', user);
       return resp.data;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data.msg);
+      return checkForUnauthorizedResponse(error, thunkAPI);
     }
   }
 );
@@ -21,7 +23,7 @@ export const loginUser = createAsyncThunk(
       const resp = await customFetch.post('/auth/login', user);
       return resp.data;
     } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data.msg);
+      return checkForUnauthorizedResponse(error, thunkAPI);
     }
   }
 );
@@ -34,11 +36,25 @@ export const updateUser = createAsyncThunk(
       return resp.data;
     } catch (error) {
       console.log(error.response);
-      if (error.response.status === 401) {
-        thunkAPI.dispatch(logoutUser());
-        return thunkAPI.rejectWithValue('Unauthorized! Logging Out...');
-      }
-      return thunkAPI.rejectWithValue(error.response.data.msg);
+      return checkForUnauthorizedResponse(error, thunkAPI);
+    }
+  }
+);
+
+export const clearStore = createAsyncThunk(
+  'user/clearStore',
+  async (message, thunkAPI) => {
+    try {
+      // logout user
+      thunkAPI.dispatch(logoutUser(message));
+      // clear jobs value
+      thunkAPI.dispatch(clearAllJobsState());
+      // clear job input values
+      thunkAPI.dispatch(clearValues());
+      return Promise.resolve();
+    } catch (error) {
+      // console.log(error);
+      return Promise.reject();
     }
   }
 );

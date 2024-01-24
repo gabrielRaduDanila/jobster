@@ -5,7 +5,7 @@ import {
   addUserToLocalStorage,
   removeUserFromLocalStorage,
 } from '../../utils/localStorage';
-import { registerUser, loginUser, updateUser } from './userThunk';
+import { registerUser, loginUser, updateUser, clearStore } from './userThunk';
 
 const initialState = {
   isLoading: false,
@@ -73,6 +73,9 @@ const userSlice = createSlice({
       .addCase(updateUser.rejected, (state, { payload }) => {
         state.isLoading = false;
         toast.error(payload);
+      })
+      .addCase(clearStore.rejected, () => {
+        toast.error('There was an error');
       });
   },
 });
